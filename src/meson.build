@@ -120,15 +120,6 @@ foreach func: c99_complex_funcs
   endif
 endforeach
 
-# We require C99 so these should always be found at build time. But for
-# libnpymath as a C99 compat layer, these may still be relevant.
-c99_macros = ['isfinite', 'isinf', 'isnan', 'signbit']
-foreach macro: c99_macros
-  if cc.has_function(macro, prefix: '#include <math.h>', dependencies: m_dep)
-    cdata.set10('NPYMATH_HAVE_DECL_' + macro.to_upper(), true)
-  endif
-endforeach
-
 if cc.has_header('features.h')
   cdata.set10('NPYMATH_HAVE_FEATURES_H', true)
 endif

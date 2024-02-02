@@ -196,7 +196,9 @@ npy_carg@c@(@ctype@ z)
 #define SCALED_CEXP_LOWERL 11357.216553474703895L
 #define SCALED_CEXP_UPPERL 22756.021937783004509L
 
-#if !defined(NPYMATH_HAVE_CEXP@C@)
+#if !defined(NPYMATH_HAVE_CSINH@C@) || \
+    !defined(NPYMATH_HAVE_CCOSH@C@) || \
+    !defined(NPYMATH_HAVE_CEXP@C@)
 
 static
 @ctype@
