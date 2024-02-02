@@ -1,4 +1,5 @@
 #mesondefine NPYMATH_HAVE_ENDIAN_H
+#mesondefine NPYMATH_HAVE_SYS_ENDIAN_H
 
 #mesondefine NPYMATH_SIZEOF_SHORT
 #mesondefine NPYMATH_SIZEOF_INT
