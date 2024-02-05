@@ -360,19 +360,25 @@ NPY_INPLACE npymath_longdouble npy_heavisidel(npymath_longdouble x, npymath_long
  * Complex declarations
  */
 
-npymath_double npy_creal(npymath_cdouble z);
+npymath_double npy_creal(const npymath_cdouble *z);
 void npy_csetreal(npymath_cdouble *z, npymath_double r);
-npymath_double npy_cimag(npymath_cdouble z);
+npymath_double npy_cimag(const npymath_cdouble *z);
 void npy_csetimag(npymath_cdouble *z, npymath_double i);
-npymath_float npy_crealf(npymath_cfloat z);
+npymath_float npy_crealf(const npymath_cfloat *z);
 void npy_csetrealf(npymath_cfloat *z, npymath_float r);
-npymath_float npy_cimagf(npymath_cfloat z);
+npymath_float npy_cimagf(const npymath_cfloat *z);
 void npy_csetimagf(npymath_cfloat *z, npymath_float i);
-npymath_longdouble npy_creall(npymath_clongdouble z);
+npymath_longdouble npy_creall(const npymath_clongdouble *z);
 void npy_csetreall(npymath_clongdouble *z, npymath_longdouble r);
-npymath_longdouble npy_cimagl(npymath_clongdouble z);
+npymath_longdouble npy_cimagl(const npymath_clongdouble *z);
 void npy_csetimagl(npymath_clongdouble *z, npymath_longdouble i);
 
+#define NPY_CREAL(z) npy_creal(z)
+#define NPY_CREALF(z) npy_crealf(z)
+#define NPY_CREALL(z) npy_creall(z)
+#define NPY_CIMAG(z) npy_cimag(z)
+#define NPY_CIMAGF(z) npy_cimagf(z)
+#define NPY_CIMAGL(z) npy_cimagl(z)
 #define NPY_CSETREAL(z, r) npy_csetreal(z, r)
 #define NPY_CSETIMAG(z, i) npy_csetimag(z, i)
 #define NPY_CSETREALF(z, r) npy_csetrealf(z, r)
