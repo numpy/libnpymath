@@ -298,6 +298,34 @@ if get_option('install_lib')
     install_dir: py.get_install_dir() / get_option('lib_dir'),
   )
 
+  dir_separator = '/'
+  if build_machine.system() == 'windows'
+    dir_separator = '\\'
+  endif
+
+  configure_file(
+    input: 'npymath.ini.in',
+    output: 'npymath.ini',
+    configuration: configuration_data({
+      'pkgname' : 'numpy._core',
+      'sep' : dir_separator,
+    }),
+    install: true,
+    install_dir: py.get_install_dir() / get_option('lib_dir') / 'npy-pkg-config',
+    install_tag: 'devel'
+  )
+  configure_file(
+    input: 'mlib.ini.in',
+    output: 'mlib.ini',
+    configuration: configuration_data({
+      'posix_mathlib' : mlib_linkflag,
+      'msvc_mathlib' : 'm.lib',
+    }),
+    install: true,
+    install_dir: py.get_install_dir() / get_option('lib_dir') / 'npy-pkg-config',
+    install_tag: 'devel'
+  )
+
   py.install_sources(
     [
       'include/numpy/npy_math.h',
