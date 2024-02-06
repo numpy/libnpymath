@@ -82,10 +82,10 @@ static inline
 cmul@c@(@ctype@ a, @ctype@ b)
 {
     @type@ ar, ai, br, bi;
-    ar = npy_creal@c@(a);
-    ai = npy_cimag@c@(a);
-    br = npy_creal@c@(b);
-    bi = npy_cimag@c@(b);
+    ar = npy_creal@c@(&a);
+    ai = npy_cimag@c@(&a);
+    br = npy_creal@c@(&b);
+    bi = npy_cimag@c@(&b);
     return npy_cpack@c@(ar*br - ai*bi, ar*bi + ai*br);
 }
 
@@ -94,10 +94,10 @@ static inline
 cdiv@c@(@ctype@ a, @ctype@ b)
 {
     @type@ ar, ai, br, bi, abs_br, abs_bi;
-    ar = npy_creal@c@(a);
-    ai = npy_cimag@c@(a);
-    br = npy_creal@c@(b);
-    bi = npy_cimag@c@(b);
+    ar = npy_creal@c@(&a);
+    ai = npy_cimag@c@(&a);
+    br = npy_creal@c@(&b);
+    bi = npy_cimag@c@(&b);
     abs_br = npy_fabs@c@(br);
     abs_bi = npy_fabs@c@(bi);
 
@@ -124,9 +124,9 @@ cdiv@c@(@ctype@ a, @ctype@ b)
  *=========================================================*/
 
 @type@
-npy_creal@c@(const @ctype@ z)
+npy_creal@c@(const @ctype@ *z)
 {
-    return ((@type@ *) &z)[0];
+    return ((@type@ *) z)[0];
 }
 
 void
@@ -136,9 +136,9 @@ npy_csetreal@c@(@ctype@ *z, const @type@ r)
 }
 
 @type@
-npy_cimag@c@(const @ctype@ z)
+npy_cimag@c@(const @ctype@ *z)
 {
-    return ((@type@ *) &z)[1];
+    return ((@type@ *) z)[1];
 }
 
 void
@@ -160,7 +160,7 @@ npy_cpack@c@(@type@ x, @type@ y)
 @type@
 npy_cabs@c@(@ctype@ z)
 {
-    return npy_hypot@c@(npy_creal@c@(z), npy_cimag@c@(z));
+    return npy_hypot@c@(npy_creal@c@(&z), npy_cimag@c@(&z));
 }
 #endif
 
@@ -168,7 +168,7 @@ npy_cabs@c@(@ctype@ z)
 @type@
 npy_carg@c@(@ctype@ z)
 {
-    return npy_atan2@c@(npy_cimag@c@(z), npy_creal@c@(z));
+    return npy_atan2@c@(npy_cimag@c@(&z), npy_creal@c@(&z));
 }
 #endif
 
@@ -237,8 +237,8 @@ npy_cexp@c@(@ctype@ z)
     @type@ r, i;
     @ctype@ ret;
 
-    r = npy_creal@c@(z);
-    i = npy_cimag@c@(z);
+    r = npy_creal@c@(&z);
+    i = npy_cimag@c@(&z);
 
     if (npy_isfinite(r)) {
         if (r >= SCALED_CEXP_LOWER@C@ && r <= SCALED_CEXP_UPPER@C@) {
@@ -336,8 +336,8 @@ npy_cexp@c@(@ctype@ z)
 @ctype@
 npy_clog@c@(@ctype@ z)
 {
-    @type@ ax = npy_fabs@c@(npy_creal@c@(z));
-    @type@ ay = npy_fabs@c@(npy_cimag@c@(z));
+    @type@ ax = npy_fabs@c@(npy_creal@c@(&z));
+    @type@ ay = npy_fabs@c@(npy_cimag@c@(&z));
     @type@ rr, ri;
 
     if (ax > @TMAX@/4 || ay > @TMAX@/4) {
@@ -352,7 +352,7 @@ npy_clog@c@(@ctype@ z)
         else {
             /* log(+/-0 +/- 0i) */
             /* raise divide-by-zero floating point exception */
-            rr = -1.0@c@ / npy_creal@c@(z);
+            rr = -1.0@c@ / npy_creal@c@(&z);
             rr = npy_copysign@c@(rr, -1);
             ri = npy_carg@c@(z);
             return npy_cpack@c@(rr, ri);
@@ -388,8 +388,8 @@ npy_csqrt@c@(@ctype@ z)
     @type@ t;
     int scale;
 
-    a = npy_creal@c@(z);
-    b = npy_cimag@c@(z);
+    a = npy_creal@c@(&z);
+    b = npy_cimag@c@(&z);
 
     /* Handle special cases. */
     if (a == 0 && b == 0) {
@@ -443,7 +443,7 @@ npy_csqrt@c@(@ctype@ z)
 
     /* Rescale. */
     if (scale) {
-        return (npy_cpack@c@(npy_creal@c@(result) * 2, npy_cimag@c@(result)));
+        return (npy_cpack@c@(npy_creal@c@(&result) * 2, npy_cimag@c@(&result)));
     }
     else {
         return (result);
@@ -471,10 +471,10 @@ sys_cpow@c@(@ctype@ x, @ctype@ y)
 npy_cpow@c@ (@ctype@ a, @ctype@ b)
 {
     Py_intptr_t n;
-    @type@ ar = npy_creal@c@(a);
-    @type@ br = npy_creal@c@(b);
-    @type@ ai = npy_cimag@c@(a);
-    @type@ bi = npy_cimag@c@(b);
+    @type@ ar = npy_creal@c@(&a);
+    @type@ br = npy_creal@c@(&b);
+    @type@ ai = npy_cimag@c@(&a);
+    @type@ bi = npy_cimag@c@(&b);
     @ctype@ r;
 
     /*
@@ -546,7 +546,7 @@ npy_cpow@c@ (@ctype@ a, @ctype@ b)
                 }
                 p = cmul@c@(p,p);
             }
-            r = npy_cpack@c@(npy_creal@c@(aa), npy_cimag@c@(aa));
+            r = npy_cpack@c@(npy_creal@c@(&aa), npy_cimag@c@(&aa));
             if (br < 0) {
                 r = cdiv@c@(c_1@c@, r);
             }
@@ -561,8 +561,8 @@ npy_cpow@c@ (@ctype@ a, @ctype@ b)
     {
         @ctype@ loga = npy_clog@c@(a);
 
-        ar = npy_creal@c@(loga);
-        ai = npy_cimag@c@(loga);
+        ar = npy_creal@c@(&loga);
+        ai = npy_cimag@c@(&loga);
         return npy_cexp@c@(npy_cpack@c@(ar*br - ai*bi, ar*bi + ai*br));
     }
 
@@ -575,7 +575,7 @@ npy_cpow@c@ (@ctype@ a, @ctype@ b)
 npy_ccos@c@(@ctype@ z)
 {
     /* ccos(z) = ccosh(I * z) */
-    return npy_ccosh@c@(npy_cpack@c@(-npy_cimag@c@(z), npy_creal@c@(z)));
+    return npy_ccosh@c@(npy_cpack@c@(-npy_cimag@c@(&z), npy_creal@c@(&z)));
 }
 #endif
 
@@ -584,8 +584,8 @@ npy_ccos@c@(@ctype@ z)
 npy_csin@c@(@ctype@ z)
 {
     /* csin(z) = -I * csinh(I * z) */
-    z = npy_csinh@c@(npy_cpack@c@(-npy_cimag@c@(z), npy_creal@c@(z)));
-    return npy_cpack@c@(npy_cimag@c@(z), -npy_creal@c@(z));
+    z = npy_csinh@c@(npy_cpack@c@(-npy_cimag@c@(&z), npy_creal@c@(&z)));
+    return npy_cpack@c@(npy_cimag@c@(&z), -npy_creal@c@(&z));
 }
 #endif
 
@@ -594,8 +594,8 @@ npy_csin@c@(@ctype@ z)
 npy_ctan@c@(@ctype@ z)
 {
     /* ctan(z) = -I * ctanh(I * z) */
-    z = npy_ctanh@c@(npy_cpack@c@(-npy_cimag@c@(z), npy_creal@c@(z)));
-    return (npy_cpack@c@(npy_cimag@c@(z), -npy_creal@c@(z)));
+    z = npy_ctanh@c@(npy_cpack@c@(-npy_cimag@c@(&z), npy_creal@c@(&z)));
+    return (npy_cpack@c@(npy_cimag@c@(&z), -npy_creal@c@(&z)));
 }
 #endif
 
@@ -639,8 +639,8 @@ npy_ccosh@c@(@ctype@ z)
     @type@  x, y, h, absx;
     npymath_int xfinite, yfinite;
 
-    x = npy_creal@c@(z);
-    y = npy_cimag@c@(z);
+    x = npy_creal@c@(&z);
+    y = npy_cimag@c@(&z);
 
     xfinite = npy_isfinite(x);
     yfinite = npy_isfinite(y);
@@ -667,8 +667,8 @@ npy_ccosh@c@(@ctype@ z)
         else if (absx < SCALED_CEXP_UPPER@C@) {
             /* x < 1455: scale to avoid overflow */
             z = _npy_scaled_cexp@c@(absx, y, -1);
-            return npy_cpack@c@(npy_creal@c@(z),
-                                npy_cimag@c@(z) * npy_copysign@c@(1, x));
+            return npy_cpack@c@(npy_creal@c@(&z),
+                                npy_cimag@c@(&z) * npy_copysign@c@(1, x));
         }
         else {
             /* x >= 1455: the result always overflows */
@@ -781,8 +781,8 @@ npy_csinh@c@(@ctype@ z)
     @type@ x, y, h, absx;
     npymath_int xfinite, yfinite;
 
-    x = npy_creal@c@(z);
-    y = npy_cimag@c@(z);
+    x = npy_creal@c@(&z);
+    y = npy_cimag@c@(&z);
 
     xfinite = npy_isfinite(x);
     yfinite = npy_isfinite(y);
@@ -809,8 +809,8 @@ npy_csinh@c@(@ctype@ z)
         else if (x < SCALED_CEXP_UPPER@C@) {
             /* x < 1455: scale to avoid overflow */
             z = _npy_scaled_cexp@c@(absx, y, -1);
-            return npy_cpack@c@(npy_creal@c@(z) * npy_copysign@c@(1, x),
-                                npy_cimag@c@(z));
+            return npy_cpack@c@(npy_creal@c@(&z) * npy_copysign@c@(1, x),
+                                npy_cimag@c@(&z));
         }
         else {
             /* x >= 1455: the result always overflows */
@@ -944,8 +944,8 @@ npy_ctanh@c@(@ctype@ z)
     @type@ x, y;
     @type@ t, beta, s, rho, denom;
 
-    x = npy_creal@c@(z);
-    y = npy_cimag@c@(z);
+    x = npy_creal@c@(&z);
+    y = npy_cimag@c@(&z);
 
     /*
      * ctanh(NaN + i 0) = NaN + i 0
@@ -1303,8 +1303,8 @@ npy_cacos@c@(@ctype@ z)
     npymath_int sx, sy;
     npymath_int B_is_usable;
 
-    x = npy_creal@c@(z);
-    y = npy_cimag@c@(z);
+    x = npy_creal@c@(&z);
+    y = npy_cimag@c@(&z);
     sx = npy_signbit(x);
     sy = npy_signbit(y);
     ax = npy_fabs@c@(x);
@@ -1383,8 +1383,8 @@ npy_cacos@c@(@ctype@ z)
 npy_casin@c@(@ctype@ z)
 {
     /* casin(z) = I * conj( casinh(I * conj(z)) ) */
-    z = npy_casinh@c@(npy_cpack@c@(npy_cimag@c@(z), npy_creal@c@(z)));
-    return npy_cpack@c@(npy_cimag@c@(z), npy_creal@c@(z));
+    z = npy_casinh@c@(npy_cpack@c@(npy_cimag@c@(&z), npy_creal@c@(&z)));
+    return npy_cpack@c@(npy_cimag@c@(&z), npy_creal@c@(&z));
 }
 #endif
 
@@ -1393,8 +1393,8 @@ npy_casin@c@(@ctype@ z)
 npy_catan@c@(@ctype@ z)
 {
     /* catan(z) = I * conj( catanh(I * conj(z)) ) */
-    z = npy_catanh@c@(npy_cpack@c@(npy_cimag@c@(z), npy_creal@c@(z)));
-    return npy_cpack@c@(npy_cimag@c@(z), npy_creal@c@(z));
+    z = npy_catanh@c@(npy_cpack@c@(npy_cimag@c@(&z), npy_creal@c@(&z)));
+    return npy_cpack@c@(npy_cimag@c@(&z), npy_creal@c@(&z));
 }
 #endif
 
@@ -1410,8 +1410,8 @@ npy_cacosh@c@(@ctype@ z)
     @type@ rx, ry;
 
     w = npy_cacos@c@(z);
-    rx = npy_creal@c@(w);
-    ry = npy_cimag@c@(w);
+    rx = npy_creal@c@(&w);
+    ry = npy_cimag@c@(&w);
     /* cacosh(NaN + I*NaN) = NaN + I*NaN */
     if (npy_isnan(rx) && npy_isnan(ry)) {
         return npy_cpack@c@(ry, rx);
@@ -1425,7 +1425,7 @@ npy_cacosh@c@(@ctype@ z)
     if (npy_isnan(ry)) {
         return npy_cpack@c@(ry, ry);
     }
-    return npy_cpack@c@(npy_fabs@c@(ry), npy_copysign@c@(rx, npy_cimag@c@(z)));
+    return npy_cpack@c@(npy_fabs@c@(ry), npy_copysign@c@(rx, npy_cimag@c@(&z)));
 }
 #endif
 
@@ -1455,8 +1455,8 @@ npy_casinh@c@(@ctype@ z)
     @type@ x, y, ax, ay, wx, wy, rx, ry, B, sqrt_A2my2, new_y;
     npymath_int B_is_usable;
 
-    x = npy_creal@c@(z);
-    y = npy_cimag@c@(z);
+    x = npy_creal@c@(&z);
+    y = npy_cimag@c@(&z);
     ax = npy_fabs@c@(x);
     ay = npy_fabs@c@(y);
 
@@ -1701,8 +1701,8 @@ npy_catanh@c@(@ctype@ z)
     const @type@ pio2_hi = NPY_PI_2@c@;
     @type@ x, y, ax, ay, rx, ry;
 
-    x = npy_creal@c@(z);
-    y = npy_cimag@c@(z);
+    x = npy_creal@c@(&z);
+    y = npy_cimag@c@(&z);
     ax = npy_fabs@c@(x);
     ay = npy_fabs@c@(y);
 
