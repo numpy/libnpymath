@@ -21,7 +21,7 @@ if get_option('install_lib')
     command: [src_file_cli, '@INPUT@', '-o', '@OUTPUT@'],
     # This installs the header in the numpy include folder
     install: true,
-    install_dir: install_dir / get_option('headers_dir') / 'npymath',
+    install_dir: install_dir / get_option('headers_dir') / 'libnpymath',
   )
 else
   internal_h = custom_target(

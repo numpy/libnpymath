@@ -1,9 +1,9 @@
-#ifndef NPYMATH_CONFIG_H_
-#define NPYMATH_CONFIG_H_
+#ifndef LIBNPYMATH_BLOCK_H_
+#define LIBNPYMATH_BLOCK_H_
 
-#include "numpy/npymath/meson_config.h"
-#include "numpy/npymath/config.h"
-#include "numpy/npymath/utils.h"
+#include "libnpymath/meson_config.h"
+#include "libnpymath/config.h"
+#include "libnpymath/utils.h"
 
 /* blocklist */
 
@@ -183,4 +183,4 @@
 #endif  /* defined(__GLIBC) */
 #endif  /* defined(NPYMATH_HAVE_FEATURES_H) */
 
-#endif  /* NPYMATH_CONFIG_H_ */
+#endif  /* LIBNPYMATH_BLOCK_H_ */

@@ -1,5 +1,5 @@
-#ifndef NPYMATH_UTILS_H_
-#define NPYMATH_UTILS_H_
+#ifndef LIBNPYMATH_UTILS_H_
+#define LIBNPYMATH_UTILS_H_
 
 #ifndef __COMP_NPYMATH_UNUSED
     #if defined(__GNUC__)
@@ -22,4 +22,4 @@
 #define NPYMATH_CAT_(a, b) NPYMATH_CAT__(a, b)
 #define NPYMATH_CAT(a, b) NPYMATH_CAT_(a, b)
 
-#endif  /* NPYMATH_UTILS_H_ */
+#endif  /* LIBNPYMATH_UTILS_H_ */

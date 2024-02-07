@@ -21,10 +21,10 @@
  *              NPYMATH_CPU_LOONGARCH
  *              NPYMATH_CPU_WASM
  */
-#ifndef NPYMATH_CPU_H_
-#define NPYMATH_CPU_H_
+#ifndef LIBNPYMATH_CPU_H_
+#define LIBNPYMATH_CPU_H_
 
-#include "numpy/npymath/config.h"
+#include "libnpymath/config.h"
 
 #if defined( __i386__ ) || defined(i386) || defined(_M_IX86)
     /*
@@ -114,4 +114,4 @@
     information about your platform (OS, CPU and compiler)
 #endif
 
-#endif  /* NPYMATH_CPU_H_ */
+#endif  /* LIBNPYMATH_CPU_H_ */

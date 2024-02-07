@@ -1,10 +1,10 @@
-#ifndef NPYMATH_FPMATH_H_
-#define NPYMATH_FPMATH_H_
+#ifndef LIBNPYMATH_FPMATH_H_
+#define LIBNPYMATH_FPMATH_H_
 
-#include "numpy/npymath/block.h"
+#include "libnpymath/block.h"
 
-#include "numpy/npymath/cpu.h"
-#include "numpy/npymath/common.h"
+#include "libnpymath/cpu.h"
+#include "libnpymath/common.h"
 
 #if !(defined(NPYMATH_HAVE_LDOUBLE_IEEE_QUAD_BE) || \
       defined(NPYMATH_HAVE_LDOUBLE_IEEE_QUAD_LE) || \
@@ -26,4 +26,4 @@
     #define NPYMATH_HAVE_LDOUBLE_DOUBLE_DOUBLE_BE
 #endif
 
-#endif  /* NPYMATH_FPMATH_H_ */
+#endif  /* LIBNPYMATH_FPMATH_H_ */

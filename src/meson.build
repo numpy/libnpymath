@@ -73,9 +73,6 @@ foreach symbol_type: complex_types_to_check
   cdata.set(symbol_type[0], cc.sizeof(symbol_type[1], prefix: '#include <complex.h>'))
 endforeach
 
-# Mandatory functions: if not found, fail the build
-# Some of these can still be blocklisted if the C99 implementation
-# is buggy, see numpy/_core/src/common/npy_config.h
 mandatory_math_funcs = [
   'sin', 'cos', 'tan', 'sinh', 'cosh', 'tanh', 'fabs',
   'floor', 'ceil', 'sqrt', 'log10', 'log', 'exp', 'asin',
@@ -251,7 +248,7 @@ if cc.has_header('sys/endian.h')
   cdata.set10('NPYMATH_HAVE_SYS_ENDIAN_H', true)
 endif
 
-subdir('include/numpy/npymath')
+subdir('include/libnpymath')
 
 # Build npymath static library
 # ----------------------------
@@ -300,26 +297,20 @@ if get_option('install_lib')
 
   py.install_sources(
     [
-      'include/numpy/npy_math.h',
-      'include/numpy/halffloat.h',
-    ],
-    subdir: get_option('headers_dir'),
-  )
-
-  py.install_sources(
-    [
-      'include/numpy/npymath/common.h',
-      'include/numpy/npymath/config.h',
+      'include/libnpymath/npy_math.h',
+      'include/libnpymath/halffloat.h',
+      'include/libnpymath/common.h',
+      'include/libnpymath/config.h',
       _config_h,
       meson_config_h,
-      'include/numpy/npymath/block.h',
-      'include/numpy/npymath/cpu.h',
-      'include/numpy/npymath/endian.h',
-      'include/numpy/npymath/fpmath.h',
-      'include/numpy/npymath/utils.h',
-      'include/numpy/npymath/private.h',
+      'include/libnpymath/block.h',
+      'include/libnpymath/cpu.h',
+      'include/libnpymath/endian.h',
+      'include/libnpymath/fpmath.h',
+      'include/libnpymath/utils.h',
+      'include/libnpymath/private.h',
     ],
-    subdir: get_option('headers_dir') / 'npymath',
+    subdir: get_option('headers_dir') / 'libnpymath',
   )
 else
   libnpymath = library(

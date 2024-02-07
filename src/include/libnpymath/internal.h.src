@@ -53,10 +53,10 @@
  * is preserved.
  * ====================================================
  */
-#ifndef NPYMATH_INTERNAL_H_
-#define NPYMATH_INTERNAL_H_
+#ifndef LIBNPYMATH_INTERNAL_H_
+#define LIBNPYMATH_INTERNAL_H_
 
-#include "numpy/npymath/private.h"
+#include "libnpymath/private.h"
 #ifdef _MSC_VER
 #  include <intrin.h>   // for __popcnt
 #endif
@@ -96,17 +96,17 @@ static const npymath_uint64 MAGIC64[] = {0x5555555555555555ull, 0x33333333333333
 /* Taken from FreeBSD mlib, adapted for numpy
  *
  * XXX: we could be a bit faster by reusing high/low words for inf/nan
- * classification instead of calling npy_isinf/npy_isnan: we should have some
+ * classification instead of calling npymath_isinf/npymath_isnan: we should have some
  * macros for this, though, instead of doing it manually
  */
-NPY_INPLACE double npy_log2(double x)
+NPYMATH_INPLACE double npymath_log2(double x)
 {
 #ifndef NPYMATH_BLOCK_LOG2
     return log2(x);
 #else
-    if (!npy_isfinite(x) || x <= 0.) {
+    if (!npymath_isfinite(x) || x <= 0.) {
         /* special value result */
-        return npy_log(x);
+        return npymath_log(x);
     }
     else {
         /*
@@ -134,12 +134,12 @@ NPY_INPLACE double npy_log2(double x)
 /* Taken from FreeBSD mlib, adapted for numpy
  *
  * XXX: we could be a bit faster by reusing high/low words for inf/nan
- * classification instead of calling npy_isinf/npy_isnan: we should have some
+ * classification instead of calling npymath_isinf/npymath_isnan: we should have some
  * macros for this, though, instead of doing it manually
  */
 /* XXX: we should have this in npy_math.h */
-#define NPY_DBL_EPSILON 1.2246467991473531772E-16
-NPY_INPLACE double npy_atan2(double y, double x)
+#define NPYMATH_DBL_EPSILON 1.2246467991473531772E-16
+NPYMATH_INPLACE double npymath_atan2(double y, double x)
 {
 #ifndef NPYMATH_BLOCK_ATAN2
     return atan2(y, x);
@@ -154,67 +154,67 @@ NPY_INPLACE double npy_atan2(double y, double x)
     iy = hy & 0x7fffffff;
 
     /* if x or y is nan, return nan */
-    if (npy_isnan(x * y)) {
+    if (npymath_isnan(x * y)) {
         return x + y;
     }
 
     if (x == 1.0) {
-        return npy_atan(y);
+        return npymath_atan(y);
     }
 
-    m = 2 * (npy_signbit((x)) != 0) + (npy_signbit((y)) != 0);
+    m = 2 * (npymath_signbit((x)) != 0) + (npymath_signbit((y)) != 0);
     if (y == 0.0) {
         switch(m) {
         case 0:
         case 1: return  y;  /* atan(+-0,+anything)=+-0 */
-        case 2: return  NPY_PI;/* atan(+0,-anything) = pi */
-        case 3: return -NPY_PI;/* atan(-0,-anything) =-pi */
+        case 2: return  NPYMATH_PI;/* atan(+0,-anything) = pi */
+        case 3: return -NPYMATH_PI;/* atan(-0,-anything) =-pi */
         }
     }
 
     if (x == 0.0) {
-        return y > 0 ? NPY_PI_2 : -NPY_PI_2;
+        return y > 0 ? NPYMATH_PI_2 : -NPYMATH_PI_2;
     }
 
-    if (npy_isinf(x)) {
-        if (npy_isinf(y)) {
+    if (npymath_isinf(x)) {
+        if (npymath_isinf(y)) {
             switch(m) {
-                case 0: return  NPY_PI_4;/* atan(+INF,+INF) */
-                case 1: return -NPY_PI_4;/* atan(-INF,+INF) */
-                case 2: return  3.0*NPY_PI_4;/*atan(+INF,-INF)*/
-                case 3: return -3.0*NPY_PI_4;/*atan(-INF,-INF)*/
+                case 0: return  NPYMATH_PI_4;/* atan(+INF,+INF) */
+                case 1: return -NPYMATH_PI_4;/* atan(-INF,+INF) */
+                case 2: return  3.0*NPYMATH_PI_4;/*atan(+INF,-INF)*/
+                case 3: return -3.0*NPYMATH_PI_4;/*atan(-INF,-INF)*/
             }
         } else {
             switch(m) {
-                case 0: return  NPY_PZERO;  /* atan(+...,+INF) */
-                case 1: return  NPY_NZERO;  /* atan(-...,+INF) */
-                case 2: return  NPY_PI;  /* atan(+...,-INF) */
-                case 3: return -NPY_PI;  /* atan(-...,-INF) */
+                case 0: return  NPYMATH_PZERO;  /* atan(+...,+INF) */
+                case 1: return  NPYMATH_NZERO;  /* atan(-...,+INF) */
+                case 2: return  NPYMATH_PI;  /* atan(+...,-INF) */
+                case 3: return -NPYMATH_PI;  /* atan(-...,-INF) */
             }
         }
     }
 
-    if (npy_isinf(y)) {
-        return y > 0 ? NPY_PI_2 : -NPY_PI_2;
+    if (npymath_isinf(y)) {
+        return y > 0 ? NPYMATH_PI_2 : -NPYMATH_PI_2;
     }
 
     /* compute y/x */
     k = (iy - ix) >> 20;
     if (k > 60) {            /* |y/x| >  2**60 */
-        z = NPY_PI_2 + 0.5 * NPY_DBL_EPSILON;
+        z = NPYMATH_PI_2 + 0.5 * NPYMATH_DBL_EPSILON;
         m &= 1;
     } else if (hx < 0 && k < -60) {
         z = 0.0;    /* 0 > |y|/x > -2**-60 */
     } else {
-        z = npy_atan(npy_fabs(y/x));        /* safe to do y/x */
+        z = npymath_atan(npymath_fabs(y/x));        /* safe to do y/x */
     }
 
     switch (m) {
         case 0: return  z  ;    /* atan(+,+) */
         case 1: return -z  ;    /* atan(-,+) */
-        case 2: return  NPY_PI - (z - NPY_DBL_EPSILON);/* atan(+,-) */
+        case 2: return  NPYMATH_PI - (z - NPYMATH_DBL_EPSILON);/* atan(+,-) */
         default: /* case 3 */
-            return  (z - NPY_DBL_EPSILON) - NPY_PI;/* atan(-,-) */
+            return  (z - NPYMATH_DBL_EPSILON) - NPYMATH_PI;/* atan(-,-) */
     }
 #endif
 }
@@ -223,23 +223,23 @@ NPY_INPLACE double npy_atan2(double y, double x)
 
 
 
-NPY_INPLACE double npy_hypot(double x, double y)
+NPYMATH_INPLACE double npymath_hypot(double x, double y)
 {
 #ifndef NPYMATH_BLOCK_HYPOT
     return hypot(x, y);
 #else
     double yx;
 
-    if (npy_isinf(x) || npy_isinf(y)) {
-        return NPY_INFINITY;
+    if (npymath_isinf(x) || npymath_isinf(y)) {
+        return NPYMATH_INFINITY;
     }
 
-    if (npy_isnan(x) || npy_isnan(y)) {
-        return NPY_NAN;
+    if (npymath_isnan(x) || npymath_isnan(y)) {
+        return NPYMATH_NAN;
     }
 
-    x = npy_fabs(x);
-    y = npy_fabs(y);
+    x = npymath_fabs(x);
+    y = npymath_fabs(y);
     if (x < y) {
         double temp = x;
         x = y;
@@ -250,7 +250,7 @@ NPY_INPLACE double npy_hypot(double x, double y)
     }
     else {
         yx = y/x;
-        return x*npy_sqrt(1.+yx*yx);
+        return x*npymath_sqrt(1.+yx*yx);
     }
 #endif
 }
@@ -285,11 +285,11 @@ NPY_INPLACE double npy_hypot(double x, double y)
  * #c = l,,f#
  * #C = L,,F#
  */
-#undef NPY__FP_SFX
+#undef NPYMATH__FP_SFX
 #if NPYMATH_SIZEOF_@TYPE@ == NPYMATH_SIZEOF_DOUBLE
-    #define NPY__FP_SFX(X) X
+    #define NPYMATH__FP_SFX(X) X
 #else
-    #define NPY__FP_SFX(X) NPYMATH_CAT(X, @c@)
+    #define NPYMATH__FP_SFX(X) NPYMATH_CAT(X, @c@)
 #endif
 /*
  * On arm64 macOS, there's a bug with sin, cos, and tan where they don't
@@ -305,14 +305,14 @@ NPY_INPLACE double npy_hypot(double x, double y)
  * #kind = sin,cos,tan#
  * #TRIG_WORKAROUND = WORKAROUND_APPLE_TRIG_BUG*3#
  */
-NPY_INPLACE @type@ npy_@kind@@c@(@type@ x)
+NPYMATH_INPLACE @type@ npymath_@kind@@c@(@type@ x)
 {
 #if @TRIG_WORKAROUND@
-    if (!npy_isfinite(x)) {
+    if (!npymath_isfinite(x)) {
         return (x - x);
     }
 #endif
-    return NPY__FP_SFX(@kind@)(x);
+    return NPYMATH__FP_SFX(@kind@)(x);
 }
 
 /**end repeat1**/
@@ -329,11 +329,11 @@ NPY_INPLACE @type@ npy_@kind@@c@(@type@ x)
  * #c = f,l#
  * #C = F,L#
  */
-#undef NPY__FP_SFX
+#undef NPYMATH__FP_SFX
 #if NPYMATH_SIZEOF_@TYPE@ == NPYMATH_SIZEOF_DOUBLE
-    #define NPY__FP_SFX(X) X
+    #define NPYMATH__FP_SFX(X) X
 #else
-    #define NPY__FP_SFX(X) NPYMATH_CAT(X, @c@)
+    #define NPYMATH__FP_SFX(X) NPYMATH_CAT(X, @c@)
 #endif
 
 /**begin repeat1
@@ -345,16 +345,16 @@ NPY_INPLACE @type@ npy_@kind@@c@(@type@ x)
 #undef @kind@@c@
 #endif
 #ifdef NPYMATH_BLOCK_@KIND@@C@
-NPY_INPLACE @type@ npy_@kind@@c@(@type@ x)
+NPYMATH_INPLACE @type@ npymath_@kind@@c@(@type@ x)
 {
-    return (@type@) npy_@kind@((double)x);
+    return (@type@) npymath_@kind@((double)x);
 }
 #endif
 
 #ifndef NPYMATH_BLOCK_@KIND@@C@
-NPY_INPLACE @type@ npy_@kind@@c@(@type@ x)
+NPYMATH_INPLACE @type@ npymath_@kind@@c@(@type@ x)
 {
-    return NPY__FP_SFX(@kind@)(x);
+    return NPYMATH__FP_SFX(@kind@)(x);
 }
 #endif
 
@@ -369,16 +369,16 @@ NPY_INPLACE @type@ npy_@kind@@c@(@type@ x)
 #undef @kind@@c@
 #endif
 #ifdef NPYMATH_BLOCK_@KIND@@C@
-NPY_INPLACE @type@ npy_@kind@@c@(@type@ x, @type@ y)
+NPYMATH_INPLACE @type@ npymath_@kind@@c@(@type@ x, @type@ y)
 {
-    return (@type@) npy_@kind@((double)x, (double) y);
+    return (@type@) npymath_@kind@((double)x, (double) y);
 }
 #endif
 
 #ifndef NPYMATH_BLOCK_@KIND@@C@
-NPY_INPLACE @type@ npy_@kind@@c@(@type@ x, @type@ y)
+NPYMATH_INPLACE @type@ npymath_@kind@@c@(@type@ x, @type@ y)
 {
-    return NPY__FP_SFX(@kind@)(x, y);
+    return NPYMATH__FP_SFX(@kind@)(x, y);
 }
 #endif
 /**end repeat1**/
@@ -387,19 +387,19 @@ NPY_INPLACE @type@ npy_@kind@@c@(@type@ x, @type@ y)
 #undef modf@c@
 #endif
 #ifdef NPYMATH_BLOCK_MODF@C@
-NPY_INPLACE @type@ npy_modf@c@(@type@ x, @type@ *iptr)
+NPYMATH_INPLACE @type@ npymath_modf@c@(@type@ x, @type@ *iptr)
 {
     double niptr;
-    double y = npy_modf((double)x, &niptr);
+    double y = npymath_modf((double)x, &niptr);
     *iptr = (@type@) niptr;
     return (@type@) y;
 }
 #endif
 
 #ifndef NPYMATH_BLOCK_MODF@C@
-NPY_INPLACE @type@ npy_modf@c@(@type@ x, @type@ *iptr)
+NPYMATH_INPLACE @type@ npymath_modf@c@(@type@ x, @type@ *iptr)
 {
-    return NPY__FP_SFX(modf)(x, iptr);
+    return NPYMATH__FP_SFX(modf)(x, iptr);
 }
 #endif
 
@@ -407,7 +407,7 @@ NPY_INPLACE @type@ npy_modf@c@(@type@ x, @type@ *iptr)
 /**end repeat**/
 
 
-#undef NPY__FP_SFX
+#undef NPYMATH__FP_SFX
 
 
 /*
@@ -420,16 +420,16 @@ NPY_INPLACE @type@ npy_modf@c@(@type@ x, @type@ *iptr)
  * #c = f, ,l#
  * #C = F, ,L#
  */
-#undef NPY__FP_SFX
+#undef NPYMATH__FP_SFX
 #if NPYMATH_SIZEOF_@TYPE@ == NPYMATH_SIZEOF_DOUBLE
-    #define NPY__FP_SFX(X) X
+    #define NPYMATH__FP_SFX(X) X
 #else
-    #define NPY__FP_SFX(X) NPYMATH_CAT(X, @c@)
+    #define NPYMATH__FP_SFX(X) NPYMATH_CAT(X, @c@)
 #endif
-@type@ npy_heaviside@c@(@type@ x, @type@ h0)
+@type@ npymath_heaviside@c@(@type@ x, @type@ h0)
 {
-    if (npy_isnan(x)) {
-        return (@type@) NPY_NAN;
+    if (npymath_isnan(x)) {
+        return (@type@) NPYMATH_NAN;
     }
     else if (x == 0) {
         return h0;
@@ -442,32 +442,32 @@ NPY_INPLACE @type@ npy_modf@c@(@type@ x, @type@ *iptr)
     }
 }
 
-#define LOGE2    NPY__FP_SFX(NPY_LOGE2)
-#define LOG2E    NPY__FP_SFX(NPY_LOG2E)
-#define RAD2DEG  (NPY__FP_SFX(180.0)/NPY__FP_SFX(NPY_PI))
-#define DEG2RAD  (NPY__FP_SFX(NPY_PI)/NPY__FP_SFX(180.0))
+#define LOGE2    NPYMATH__FP_SFX(NPYMATH_LOGE2)
+#define LOG2E    NPYMATH__FP_SFX(NPYMATH_LOG2E)
+#define RAD2DEG  (NPYMATH__FP_SFX(180.0)/NPYMATH__FP_SFX(NPYMATH_PI))
+#define DEG2RAD  (NPYMATH__FP_SFX(NPYMATH_PI)/NPYMATH__FP_SFX(180.0))
 
-NPY_INPLACE @type@ npy_rad2deg@c@(@type@ x)
+NPYMATH_INPLACE @type@ npymath_rad2deg@c@(@type@ x)
 {
     return x*RAD2DEG;
 }
 
-NPY_INPLACE @type@ npy_deg2rad@c@(@type@ x)
+NPYMATH_INPLACE @type@ npymath_deg2rad@c@(@type@ x)
 {
     return x*DEG2RAD;
 }
 
-NPY_INPLACE @type@ npy_log2_1p@c@(@type@ x)
+NPYMATH_INPLACE @type@ npymath_log2_1p@c@(@type@ x)
 {
-    return LOG2E*npy_log1p@c@(x);
+    return LOG2E*npymath_log1p@c@(x);
 }
 
-NPY_INPLACE @type@ npy_exp2_m1@c@(@type@ x)
+NPYMATH_INPLACE @type@ npymath_exp2_m1@c@(@type@ x)
 {
-    return npy_expm1@c@(LOGE2*x);
+    return npymath_expm1@c@(LOGE2*x);
 }
 
-NPY_INPLACE @type@ npy_logaddexp@c@(@type@ x, @type@ y)
+NPYMATH_INPLACE @type@ npymath_logaddexp@c@(@type@ x, @type@ y)
 {
     if (x == y) {
         /* Handles infinities of the same sign without warnings */
@@ -476,10 +476,10 @@ NPY_INPLACE @type@ npy_logaddexp@c@(@type@ x, @type@ y)
     else {
         const @type@ tmp = x - y;
         if (tmp > 0) {
-            return x + npy_log1p@c@(npy_exp@c@(-tmp));
+            return x + npymath_log1p@c@(npymath_exp@c@(-tmp));
         }
         else if (tmp <= 0) {
-            return y + npy_log1p@c@(npy_exp@c@(tmp));
+            return y + npymath_log1p@c@(npymath_exp@c@(tmp));
         }
         else {
             /* NaNs */
@@ -488,7 +488,7 @@ NPY_INPLACE @type@ npy_logaddexp@c@(@type@ x, @type@ y)
     }
 }
 
-NPY_INPLACE @type@ npy_logaddexp2@c@(@type@ x, @type@ y)
+NPYMATH_INPLACE @type@ npymath_logaddexp2@c@(@type@ x, @type@ y)
 {
     if (x == y) {
         /* Handles infinities of the same sign without warnings */
@@ -497,10 +497,10 @@ NPY_INPLACE @type@ npy_logaddexp2@c@(@type@ x, @type@ y)
     else {
         const @type@ tmp = x - y;
         if (tmp > 0) {
-            return x + npy_log2_1p@c@(npy_exp2@c@(-tmp));
+            return x + npymath_log2_1p@c@(npymath_exp2@c@(-tmp));
         }
         else if (tmp <= 0) {
-            return y + npy_log2_1p@c@(npy_exp2@c@(tmp));
+            return y + npymath_log2_1p@c@(npymath_exp2@c@(tmp));
         }
         else {
             /* NaNs */
@@ -511,10 +511,10 @@ NPY_INPLACE @type@ npy_logaddexp2@c@(@type@ x, @type@ y)
 
 /*
  * Wrapper function for remainder edge cases
- * Internally calls npy_divmod*
+ * Internally calls npymath_divmod*
  */
-NPY_INPLACE @type@
-npy_remainder@c@(@type@ a, @type@ b)
+NPYMATH_INPLACE @type@
+npymath_remainder@c@(@type@ a, @type@ b)
 {
     @type@ mod;
     if (NPYMATH_UNLIKELY(!b)) {
@@ -523,16 +523,16 @@ npy_remainder@c@(@type@ a, @type@ b)
          * result (always NaN). `divmod` may set additional FPE for the
          * division by zero creating an inf.
          */
-        mod = npy_fmod@c@(a, b);
+        mod = npymath_fmod@c@(a, b);
     }
     else {
-        npy_divmod@c@(a, b, &mod);
+        npymath_divmod@c@(a, b, &mod);
     }
     return mod;
 }
 
-NPY_INPLACE @type@
-npy_floor_divide@c@(@type@ a, @type@ b) {
+NPYMATH_INPLACE @type@
+npymath_floor_divide@c@(@type@ a, @type@ b) {
     @type@ div, mod;
     if (NPYMATH_UNLIKELY(!b)) {
         /*
@@ -543,7 +543,7 @@ npy_floor_divide@c@(@type@ a, @type@ b) {
         div = a / b;
     }
     else {
-        div = npy_divmod@c@(a, b, &mod);
+        div = npymath_divmod@c@(a, b, &mod);
     }
     return div;
 }
@@ -553,12 +553,12 @@ npy_floor_divide@c@(@type@ a, @type@ b) {
  *
  * The implementation is mostly copied from cpython 3.5.
  */
-NPY_INPLACE @type@
-npy_divmod@c@(@type@ a, @type@ b, @type@ *modulus)
+NPYMATH_INPLACE @type@
+npymath_divmod@c@(@type@ a, @type@ b, @type@ *modulus)
 {
     @type@ div, mod, floordiv;
 
-    mod = npy_fmod@c@(a, b);
+    mod = npymath_fmod@c@(a, b);
     if (NPYMATH_UNLIKELY(!b)) {
         /* b == 0 (not NaN): return result of fmod. For IEEE is nan */
         *modulus = mod;
@@ -577,18 +577,18 @@ npy_divmod@c@(@type@ a, @type@ b, @type@ *modulus)
     }
     else {
         /* if mod is zero ensure correct sign */
-        mod = npy_copysign@c@(0, b);
+        mod = npymath_copysign@c@(0, b);
     }
 
     /* snap quotient to nearest integral value */
     if (div) {
-        floordiv = npy_floor@c@(div);
+        floordiv = npymath_floor@c@(div);
         if (isgreater(div - floordiv, 0.5@c@))
             floordiv += 1.0@c@;
     }
     else {
         /* if div is zero ensure correct sign */
-        floordiv = npy_copysign@c@(0, a/b);
+        floordiv = npymath_copysign@c@(0, a/b);
     }
 
     *modulus = mod;
@@ -599,7 +599,7 @@ npy_divmod@c@(@type@ a, @type@ b, @type@ *modulus)
 #undef LOG2E
 #undef RAD2DEG
 #undef DEG2RAD
-#undef NPY__FP_SFX
+#undef NPYMATH__FP_SFX
 /**end repeat**/
 
 /**begin repeat
@@ -607,8 +607,8 @@ npy_divmod@c@(@type@ a, @type@ b, @type@ *modulus)
  * #type = npymath_uint, npymath_ulong, npymath_ulonglong#
  * #c = u,ul,ull#
  */
-NPY_INPLACE @type@
-npy_gcd@c@(@type@ a, @type@ b)
+NPYMATH_INPLACE @type@
+npymath_gcd@c@(@type@ a, @type@ b)
 {
     @type@ c;
     while (a != 0) {
@@ -619,10 +619,10 @@ npy_gcd@c@(@type@ a, @type@ b)
     return b;
 }
 
-NPY_INPLACE @type@
-npy_lcm@c@(@type@ a, @type@ b)
+NPYMATH_INPLACE @type@
+npymath_lcm@c@(@type@ a, @type@ b)
 {
-    @type@ gcd = npy_gcd@c@(a, b);
+    @type@ gcd = npymath_gcd@c@(a, b);
     return gcd == 0 ? 0 : a / gcd * b;
 }
 /**end repeat**/
@@ -633,10 +633,10 @@ npy_lcm@c@(@type@ a, @type@ b)
  * #c = (,l,ll)*2#
  * #func=gcd*3,lcm*3#
  */
-NPY_INPLACE @type@
-npy_@func@@c@(@type@ a, @type@ b)
+NPYMATH_INPLACE @type@
+npymath_@func@@c@(@type@ a, @type@ b)
 {
-    return npy_@func@u@c@(a < 0 ? -a : a, b < 0 ? -b : b);
+    return npymath_@func@u@c@(a < 0 ? -a : a, b < 0 ? -b : b);
 }
 /**end repeat**/
 
@@ -653,8 +653,8 @@ npy_@func@@c@(@type@ a, @type@ b)
  * #u         = u,#
  * #is_signed = 0,1#
  */
-NPY_INPLACE npymath_@u@@type@
-npy_lshift@u@@c@(npymath_@u@@type@ a, npymath_@u@@type@ b)
+NPYMATH_INPLACE npymath_@u@@type@
+npymath_lshift@u@@c@(npymath_@u@@type@ a, npymath_@u@@type@ b)
 {
     if (NPYMATH_LIKELY((size_t)b < sizeof(a) * CHAR_BIT)) {
         return a << b;
@@ -663,8 +663,8 @@ npy_lshift@u@@c@(npymath_@u@@type@ a, npymath_@u@@type@ b)
         return 0;
     }
 }
-NPY_INPLACE npymath_@u@@type@
-npy_rshift@u@@c@(npymath_@u@@type@ a, npymath_@u@@type@ b)
+NPYMATH_INPLACE npymath_@u@@type@
+npymath_rshift@u@@c@(npymath_@u@@type@ a, npymath_@u@@type@ b)
 {
     if (NPYMATH_LIKELY((size_t)b < sizeof(a) * CHAR_BIT)) {
         return a >> b;
@@ -700,8 +700,8 @@ npy_rshift@u@@c@(npymath_@u@@type@ a, npymath_@u@@type@ b)
 #endif
 
 
-NPY_INPLACE uint8_t
-npy_popcount_parallel@c@(npymath_@type@ a)
+NPYMATH_INPLACE uint8_t
+npymath_popcount_parallel@c@(npymath_@type@ a)
 {
     a = a - ((a >> 1) & (npymath_@type@) TO_BITS_LEN(MAGIC)[0]);
     a = ((a & (npymath_@type@) TO_BITS_LEN(MAGIC)[1])) + ((a >> 2) & (npymath_@type@) TO_BITS_LEN(MAGIC)[1]);
@@ -709,8 +709,8 @@ npy_popcount_parallel@c@(npymath_@type@ a)
     return (npymath_@type@) (a * (npymath_@type@) TO_BITS_LEN(MAGIC)[3]) >> ((NPYMATH_SIZEOF_@STYPE@ - 1) * CHAR_BIT);
 }
 
-NPY_INPLACE uint8_t
-npy_popcountu@c@(npymath_@type@ a)
+NPYMATH_INPLACE uint8_t
+npymath_popcountu@c@(npymath_@type@ a)
 {
 /* use built-in popcount if present, else use our implementation */
 #if (defined(__clang__) || defined(__GNUC__)) && NPYMATH_BITSOF_@STYPE@ >= 32
@@ -726,7 +726,7 @@ npy_popcountu@c@(npymath_@type@ a)
         return __popcnt32(left) + __popcnt32(right);
     #endif
 #else
-    return npy_popcount_parallel@c@(a);
+    return npymath_popcount_parallel@c@(a);
 #endif
 }
 /**end repeat**/
@@ -736,12 +736,12 @@ npy_popcountu@c@(npymath_@type@ a)
  * #type = byte, short, int, long, longlong#
  * #c    = hh,   h,     ,    l,    ll#
  */
-NPY_INPLACE uint8_t
-npy_popcount@c@(npymath_@type@ a)
+NPYMATH_INPLACE uint8_t
+npymath_popcount@c@(npymath_@type@ a)
 {
     /* Return popcount of abs(a) */
-    return npy_popcountu@c@(a < 0 ? -a : a);
+    return npymath_popcountu@c@(a < 0 ? -a : a);
 }
 /**end repeat**/
 
-#endif
+#endif /* LIBNPYMATH_INTERNAL_H_ */

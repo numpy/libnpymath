@@ -1,13 +1,13 @@
-#ifndef NPYMATH_COMMON_H_
-#define NPYMATH_COMMON_H_
+#ifndef LIBNPYMATH_COMMON_H_
+#define LIBNPYMATH_COMMON_H_
 
 /* need Python.h for Py_intptr_t */
 #include <Python.h>
 
 /* numpconfig.h is auto-generated */
-#include "numpy/npymath/config.h"
+#include "libnpymath/config.h"
 #if defined(NPYMATH_HAVE_CONFIG_H)
-#include "numpy/npymath/block.h"
+#include "libnpymath/block.h"
 #endif
 
 /*
@@ -166,42 +166,42 @@ typedef longdouble_t _Complex npymath_clongdouble;
 #define NPYMATH_BITSOF_LONGDOUBLE (NPYMATH_SIZEOF_LONGDOUBLE * CHAR_BIT)
 
 #if NPYMATH_BITSOF_LONG == 8
-#define NPYMATH_INT8 NPY_LONG
+#define NPYMATH_INT8
         typedef unsigned long npymath_uint8;
 #elif NPYMATH_BITSOF_LONG == 16
-#define NPYMATH_INT16 NPY_LONG
+#define NPYMATH_INT16
         typedef long npymath_int16;
         typedef unsigned long npymath_uint16;
 #elif NPYMATH_BITSOF_LONG == 32
-#define NPYMATH_INT32 NPY_LONG
+#define NPYMATH_INT32
         typedef long npymath_int32;
         typedef unsigned long npymath_uint32;
 #elif NPYMATH_BITSOF_LONG == 64
-#define NPYMATH_INT64 NPY_LONG
+#define NPYMATH_INT64
         typedef long npymath_int64;
         typedef unsigned long npymath_uint64;
 #endif
 
 #if NPYMATH_BITSOF_LONGLONG == 8
 #  ifndef NPYMATH_INT8
-#    define NPYMATH_INT8 NPY_LONGLONG
+#    define NPYMATH_INT8
         typedef npymath_ulonglong npymath_uint8;
 #  endif
 #elif NPYMATH_BITSOF_LONGLONG == 16
 #  ifndef NPYMATH_INT16
-#    define NPYMATH_INT16 NPY_LONGLONG
+#    define NPYMATH_INT16
         typedef npymath_longlong npymath_int16;
         typedef npymath_ulonglong npymath_uint16;
 #  endif
 #elif NPYMATH_BITSOF_LONGLONG == 32
 #  ifndef NPYMATH_INT32
-#    define NPYMATH_INT32 NPY_LONGLONG
+#    define NPYMATH_INT32
         typedef npymath_longlong npymath_int32;
         typedef npymath_ulonglong npymath_uint32;
 #  endif
 #elif NPYMATH_BITSOF_LONGLONG == 64
 #  ifndef NPYMATH_INT64
-#    define NPYMATH_INT64 NPY_LONGLONG
+#    define NPYMATH_INT64
         typedef npymath_longlong npymath_int64;
         typedef npymath_ulonglong npymath_uint64;
 #  endif
@@ -209,24 +209,24 @@ typedef longdouble_t _Complex npymath_clongdouble;
 
 #if NPYMATH_BITSOF_INT == 8
 #ifndef NPYMATH_INT8
-#define NPYMATH_INT8 NPY_INT
+#define NPYMATH_INT8
         typedef unsigned int npymath_uint8;
 #endif
 #elif NPYMATH_BITSOF_INT == 16
 #ifndef NPYMATH_INT16
-#define NPYMATH_INT16 NPY_INT
+#define NPYMATH_INT16
         typedef int npymath_int16;
         typedef unsigned int npymath_uint16;
 #endif
 #elif NPYMATH_BITSOF_INT == 32
 #ifndef NPYMATH_INT32
-#define NPYMATH_INT32 NPY_INT
+#define NPYMATH_INT32
         typedef int npymath_int32;
         typedef unsigned int npymath_uint32;
 #endif
 #elif NPYMATH_BITSOF_INT == 64
 #ifndef NPYMATH_INT64
-#define NPYMATH_INT64 NPY_INT
+#define NPYMATH_INT64
         typedef int npymath_int64;
         typedef unsigned int npymath_uint64;
 #endif
@@ -234,24 +234,24 @@ typedef longdouble_t _Complex npymath_clongdouble;
 
 #if NPYMATH_BITSOF_SHORT == 8
 #ifndef NPYMATH_INT8
-#define NPYMATH_INT8 NPY_SHORT
+#define NPYMATH_INT8
         typedef unsigned short npymath_uint8;
 #endif
 #elif NPYMATH_BITSOF_SHORT == 16
 #ifndef NPYMATH_INT16
-#define NPYMATH_INT16 NPY_SHORT
+#define NPYMATH_INT16
         typedef short npymath_int16;
         typedef unsigned short npymath_uint16;
 #endif
 #elif NPYMATH_BITSOF_SHORT == 32
 #ifndef NPYMATH_INT32
-#define NPYMATH_INT32 NPY_SHORT
+#define NPYMATH_INT32
         typedef short npymath_int32;
         typedef unsigned short npymath_uint32;
 #endif
 #elif NPYMATH_BITSOF_SHORT == 64
 #ifndef NPYMATH_INT64
-#define NPYMATH_INT64 NPY_SHORT
+#define NPYMATH_INT64
         typedef short npymath_int64;
         typedef unsigned short npymath_uint64;
 #endif
@@ -260,33 +260,32 @@ typedef longdouble_t _Complex npymath_clongdouble;
 
 #if NPYMATH_BITSOF_CHAR == 8
 #ifndef NPYMATH_INT8
-#define NPYMATH_INT8 NPY_BYTE
+#define NPYMATH_INT8
         typedef unsigned char npymath_uint8;
 #endif
 #elif NPYMATH_BITSOF_CHAR == 16
 #ifndef NPYMATH_INT16
-#define NPYMATH_INT16 NPY_BYTE
+#define NPYMATH_INT16
         typedef signed char npymath_int16;
         typedef unsigned char npymath_uint16;
 #endif
 #elif NPYMATH_BITSOF_CHAR == 32
 #ifndef NPYMATH_INT32
-#define NPYMATH_INT32 NPY_BYTE
+#define NPYMATH_INT32
         typedef signed char npymath_int32;
         typedef unsigned char npymath_uint32;
 #endif
 #elif NPYMATH_BITSOF_CHAR == 64
 #ifndef NPYMATH_INT64
-#define NPYMATH_INT64 NPY_BYTE
+#define NPYMATH_INT64
         typedef signed char npymath_int64;
         typedef unsigned char npymath_uint64;
 #endif
 #endif
 
 /* half/float16 isn't a floating-point type in C */
-#define NPY_FLOAT16 NPY_HALF
 typedef npymath_uint16 npymath_half;
 
 /* End of typedefs for numarray style bit-width names */
 
-#endif  /* NPYMATH_COMMON_H_ */
+#endif  /* LIBNPYMATH_COMMON_H_ */
