@@ -11,19 +11,19 @@
  * This file is actually compiled as part of the main module.
  */
 
-double npy_asinh(double x) {
+double npymath_asinh(double x) {
     return asinh(x);
 }
 
-double npy_copysign(double y, double x) {
+double npymath_copysign(double y, double x) {
     return copysign(y, x);
 }
 
-double npy_log1p(double x) {
+double npymath_log1p(double x) {
     return log1p(x);
 }
 
-double npy_nextafter(double x, double y) {
+double npymath_nextafter(double x, double y) {
     return nextafter(x, y);
 }
 

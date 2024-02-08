@@ -4,9 +4,9 @@
  *
  * Low-level routines related to IEEE-754 format
  */
-#include "npy_math_common.h"
-#include "numpy/npymath/private.h"
-#include "numpy/npymath/utils.h"
+#include "libnpymath/npy_math_common.h"
+#include "libnpymath/private.h"
+#include "libnpymath/utils.h"
 
 /*
  The below code is provided for compilers which do not yet provide C11 compatibility (gcc 4.5 and older)
@@ -301,24 +301,24 @@ static npymath_longdouble _nextl(npymath_longdouble x, int p)
  * #SUFF = F,,L#
  * #type = npymath_float, npymath_double, npymath_longdouble#
  */
-@type@ npy_spacing@suff@(@type@ x)
+@type@ npymath_spacing@suff@(@type@ x)
 {
     /* XXX: npy isnan/isinf may be optimized by bit twiddling */
-    if (npy_isinf(x)) {
-        return NPY_NAN@SUFF@;
+    if (npymath_isinf(x)) {
+        return NPYMATH_NAN@SUFF@;
     }
 
     return _next@suff@(x, 1) - x;
 }
 /**end repeat**/
 
-int npy_clear_floatstatus() {
+int npymath_clear_floatstatus() {
     char x=0;
-    return npy_clear_floatstatus_barrier(&x);
+    return npymath_clear_floatstatus_barrier(&x);
 }
-int npy_get_floatstatus() {
+int npymath_get_floatstatus() {
     char x=0;
-    return npy_get_floatstatus_barrier(&x);
+    return npymath_get_floatstatus_barrier(&x);
 }
 
 
@@ -354,7 +354,7 @@ int npy_get_floatstatus() {
 #endif
 
 
-int npy_get_floatstatus_barrier(char* param)
+int npymath_get_floatstatus_barrier(char* param)
 {
     int fpstatus = fetestexcept(FE_DIVBYZERO | FE_OVERFLOW |
                                 FE_UNDERFLOW | FE_INVALID);
@@ -365,16 +365,16 @@ int npy_get_floatstatus_barrier(char* param)
         volatile char NPYMATH_UNUSED(c) = *(char*)param;
     }
 
-    return ((FE_DIVBYZERO  & fpstatus) ? NPY_FPE_DIVIDEBYZERO : 0) |
-           ((FE_OVERFLOW   & fpstatus) ? NPY_FPE_OVERFLOW : 0) |
-           ((FE_UNDERFLOW  & fpstatus) ? NPY_FPE_UNDERFLOW : 0) |
-           ((FE_INVALID    & fpstatus) ? NPY_FPE_INVALID : 0);
+    return ((FE_DIVBYZERO  & fpstatus) ? NPYMATH_FPE_DIVIDEBYZERO : 0) |
+           ((FE_OVERFLOW   & fpstatus) ? NPYMATH_FPE_OVERFLOW : 0) |
+           ((FE_UNDERFLOW  & fpstatus) ? NPYMATH_FPE_UNDERFLOW : 0) |
+           ((FE_INVALID    & fpstatus) ? NPYMATH_FPE_INVALID : 0);
 }
 
-int npy_clear_floatstatus_barrier(char * param)
+int npymath_clear_floatstatus_barrier(char * param)
 {
     /* testing float status is 50-100 times faster than clearing on x86 */
-    int fpstatus = npy_get_floatstatus_barrier(param);
+    int fpstatus = npymath_get_floatstatus_barrier(param);
     if (fpstatus != 0) {
         feclearexcept(FE_DIVBYZERO | FE_OVERFLOW |
                       FE_UNDERFLOW | FE_INVALID);
@@ -384,22 +384,22 @@ int npy_clear_floatstatus_barrier(char * param)
 }
 
 
-void npy_set_floatstatus_divbyzero(void)
+void npymath_set_floatstatus_divbyzero(void)
 {
     feraiseexcept(FE_DIVBYZERO);
 }
 
-void npy_set_floatstatus_overflow(void)
+void npymath_set_floatstatus_overflow(void)
 {
     feraiseexcept(FE_OVERFLOW);
 }
 
-void npy_set_floatstatus_underflow(void)
+void npymath_set_floatstatus_underflow(void)
 {
     feraiseexcept(FE_UNDERFLOW);
 }
 
-void npy_set_floatstatus_invalid(void)
+void npymath_set_floatstatus_invalid(void)
 {
     feraiseexcept(FE_INVALID);
 }

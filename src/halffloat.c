@@ -1,18 +1,16 @@
-#define NPY_NO_DEPRECATED_API NPY_API_VERSION
-
-#include "numpy/halffloat.h"
+#include "libnpymath/halffloat.h"
 
 /*
  * This chooses between 'ties to even' and 'ties away from zero'.
  */
-#define NPY_HALF_ROUND_TIES_TO_EVEN 1
+#define NPYMATH_HALF_ROUND_TIES_TO_EVEN 1
 /*
  * If these are 1, the conversions try to trigger underflow,
  * overflow, and invalid exceptions in the FP system when needed.
  */
-#define NPY_HALF_GENERATE_OVERFLOW 1
-#define NPY_HALF_GENERATE_UNDERFLOW 1
-#define NPY_HALF_GENERATE_INVALID 1
+#define NPYMATH_HALF_GENERATE_OVERFLOW 1
+#define NPYMATH_HALF_GENERATE_UNDERFLOW 1
+#define NPYMATH_HALF_GENERATE_INVALID 1
 
 /*
  ********************************************************************
@@ -20,7 +18,7 @@
  ********************************************************************
  */
 
-float npy_half_to_float(npymath_half h)
+float npymath_half_to_float(npymath_half h)
 {
 #if defined(NPYMATH_HAVE_FP16)
     float ret;
@@ -36,12 +34,12 @@ float npy_half_to_float(npymath_half h)
     return vec_extract(vf32, 0);
 #else
     union { float ret; npymath_uint32 retbits; } conv;
-    conv.retbits = npy_halfbits_to_floatbits(h);
+    conv.retbits = npymath_halfbits_to_floatbits(h);
     return conv.ret;
 #endif
 }
 
-double npy_half_to_double(npymath_half h)
+double npymath_half_to_double(npymath_half h)
 {
 #if defined(NPYMATH_HAVE_AVX512FP16)
     double ret;
@@ -55,12 +53,12 @@ double npy_half_to_double(npymath_half h)
     return vec_extract(vf64, 0);
 #else
     union { double ret; npymath_uint64 retbits; } conv;
-    conv.retbits = npy_halfbits_to_doublebits(h);
+    conv.retbits = npymath_halfbits_to_doublebits(h);
     return conv.ret;
 #endif
 }
 
-npymath_half npy_float_to_half(float f)
+npymath_half npymath_float_to_half(float f)
 {
 #if defined(NPYMATH_HAVE_FP16)
     __m128 mf = _mm_load_ss(&f);
@@ -73,12 +71,12 @@ npymath_half npy_float_to_half(float f)
 #else
     union { float f; npymath_uint32 fbits; } conv;
     conv.f = f;
-    return npy_floatbits_to_halfbits(conv.fbits);
+    return npymath_floatbits_to_halfbits(conv.fbits);
 #endif
     
 }
 
-npymath_half npy_double_to_half(double d)
+npymath_half npymath_double_to_half(double d)
 {
 #if defined(NPYMATH_HAVE_AVX512FP16)
     __m128d md = _mm_load_sd(&f);
@@ -91,50 +89,50 @@ npymath_half npy_double_to_half(double d)
 #else
     union { double d; npymath_uint64 dbits; } conv;
     conv.d = d;
-    return npy_doublebits_to_halfbits(conv.dbits);
+    return npymath_doublebits_to_halfbits(conv.dbits);
 #endif
 }
 
-int npy_half_iszero(npymath_half h)
+int npymath_half_iszero(npymath_half h)
 {
     return (h&0x7fff) == 0;
 }
 
-int npy_half_isnan(npymath_half h)
+int npymath_half_isnan(npymath_half h)
 {
     return ((h&0x7c00u) == 0x7c00u) && ((h&0x03ffu) != 0x0000u);
 }
 
-int npy_half_isinf(npymath_half h)
+int npymath_half_isinf(npymath_half h)
 {
     return ((h&0x7fffu) == 0x7c00u);
 }
 
-int npy_half_isfinite(npymath_half h)
+int npymath_half_isfinite(npymath_half h)
 {
     return ((h&0x7c00u) != 0x7c00u);
 }
 
-int npy_half_signbit(npymath_half h)
+int npymath_half_signbit(npymath_half h)
 {
     return (h&0x8000u) != 0;
 }
 
-npymath_half npy_half_spacing(npymath_half h)
+npymath_half npymath_half_spacing(npymath_half h)
 {
     npymath_half ret;
     npymath_uint16 h_exp = h&0x7c00u;
     npymath_uint16 h_sig = h&0x03ffu;
     if (h_exp == 0x7c00u) {
-#if NPY_HALF_GENERATE_INVALID
-        npy_set_floatstatus_invalid();
+#if NPYMATH_HALF_GENERATE_INVALID
+        npymath_set_floatstatus_invalid();
 #endif
-        ret = NPY_HALF_NAN;
+        ret = NPYMATH_HALF_NAN;
     } else if (h == 0x7bffu) {
-#if NPY_HALF_GENERATE_OVERFLOW
-        npy_set_floatstatus_overflow();
+#if NPYMATH_HALF_GENERATE_OVERFLOW
+        npymath_set_floatstatus_overflow();
 #endif
-        ret = NPY_HALF_PINF;
+        ret = NPYMATH_HALF_PINF;
     } else if ((h&0x8000u) && h_sig == 0) { /* Negative boundary case */
         if (h_exp > 0x2c00u) { /* If result is normalized */
             ret = h_exp - 0x2c00u;
@@ -154,20 +152,20 @@ npymath_half npy_half_spacing(npymath_half h)
     return ret;
 }
 
-npymath_half npy_half_copysign(npymath_half x, npymath_half y)
+npymath_half npymath_half_copysign(npymath_half x, npymath_half y)
 {
     return (x&0x7fffu) | (y&0x8000u);
 }
 
-npymath_half npy_half_nextafter(npymath_half x, npymath_half y)
+npymath_half npymath_half_nextafter(npymath_half x, npymath_half y)
 {
     npymath_half ret;
 
-    if (npy_half_isnan(x) || npy_half_isnan(y)) {
-        ret = NPY_HALF_NAN;
-    } else if (npy_half_eq_nonan(x, y)) {
+    if (npymath_half_isnan(x) || npymath_half_isnan(y)) {
+        ret = NPYMATH_HALF_NAN;
+    } else if (npymath_half_eq_nonan(x, y)) {
         ret = x;
-    } else if (npy_half_iszero(x)) {
+    } else if (npymath_half_iszero(x)) {
         ret = (y&0x8000u) + 1; /* Smallest subnormal half */
     } else if (!(x&0x8000u)) { /* x > 0 */
         if ((npymath_int16)x > (npymath_int16)y) { /* x > y */
@@ -182,21 +180,21 @@ npymath_half npy_half_nextafter(npymath_half x, npymath_half y)
             ret = x+1;
         }
     }
-#if NPY_HALF_GENERATE_OVERFLOW
-    if (npy_half_isinf(ret) && npy_half_isfinite(x)) {
-        npy_set_floatstatus_overflow();
+#if NPYMATH_HALF_GENERATE_OVERFLOW
+    if (npymath_half_isinf(ret) && npymath_half_isfinite(x)) {
+        npymath_set_floatstatus_overflow();
     }
 #endif
 
     return ret;
 }
 
-int npy_half_eq_nonan(npymath_half h1, npymath_half h2)
+int npymath_half_eq_nonan(npymath_half h1, npymath_half h2)
 {
     return (h1 == h2 || ((h1 | h2) & 0x7fff) == 0);
 }
 
-int npy_half_eq(npymath_half h1, npymath_half h2)
+int npymath_half_eq(npymath_half h1, npymath_half h2)
 {
     /*
      * The equality cases are as follows:
@@ -204,16 +202,16 @@ int npy_half_eq(npymath_half h1, npymath_half h2)
      *   - If the values are equal, equal.
      *   - If the values are both signed zeros, equal.
      */
-    return (!npy_half_isnan(h1) && !npy_half_isnan(h2)) &&
+    return (!npymath_half_isnan(h1) && !npymath_half_isnan(h2)) &&
            (h1 == h2 || ((h1 | h2) & 0x7fff) == 0);
 }
 
-int npy_half_ne(npymath_half h1, npymath_half h2)
+int npymath_half_ne(npymath_half h1, npymath_half h2)
 {
-    return !npy_half_eq(h1, h2);
+    return !npymath_half_eq(h1, h2);
 }
 
-int npy_half_lt_nonan(npymath_half h1, npymath_half h2)
+int npymath_half_lt_nonan(npymath_half h1, npymath_half h2)
 {
     int sign_h1 = (h1 & 0x8000u) == 0x8000u;
     int sign_h2 = (h2 & 0x8000u) == 0x8000u;
@@ -229,17 +227,17 @@ int npy_half_lt_nonan(npymath_half h1, npymath_half h2)
                                 : sign_h1 && ((h1 | h2) != 0x8000u);
 }
 
-int npy_half_lt(npymath_half h1, npymath_half h2)
+int npymath_half_lt(npymath_half h1, npymath_half h2)
 {
-    return (!npy_half_isnan(h1) && !npy_half_isnan(h2)) && npy_half_lt_nonan(h1, h2);
+    return (!npymath_half_isnan(h1) && !npymath_half_isnan(h2)) && npymath_half_lt_nonan(h1, h2);
 }
 
-int npy_half_gt(npymath_half h1, npymath_half h2)
+int npymath_half_gt(npymath_half h1, npymath_half h2)
 {
-    return npy_half_lt(h2, h1);
+    return npymath_half_lt(h2, h1);
 }
 
-int npy_half_le_nonan(npymath_half h1, npymath_half h2)
+int npymath_half_le_nonan(npymath_half h1, npymath_half h2)
 {
     int sign_h1 = (h1 & 0x8000u) == 0x8000u;
     int sign_h2 = (h2 & 0x8000u) == 0x8000u;
@@ -255,25 +253,25 @@ int npy_half_le_nonan(npymath_half h1, npymath_half h2)
                                 : sign_h1 || ((h1 | h2) == 0x8000u);
 }
 
-int npy_half_le(npymath_half h1, npymath_half h2)
+int npymath_half_le(npymath_half h1, npymath_half h2)
 {
-    return (!npy_half_isnan(h1) && !npy_half_isnan(h2)) && npy_half_le_nonan(h1, h2);
+    return (!npymath_half_isnan(h1) && !npymath_half_isnan(h2)) && npymath_half_le_nonan(h1, h2);
 }
 
-int npy_half_ge(npymath_half h1, npymath_half h2)
+int npymath_half_ge(npymath_half h1, npymath_half h2)
 {
-    return npy_half_le(h2, h1);
+    return npymath_half_le(h2, h1);
 }
 
-npymath_half npy_half_divmod(npymath_half h1, npymath_half h2, npymath_half *modulus)
+npymath_half npymath_half_divmod(npymath_half h1, npymath_half h2, npymath_half *modulus)
 {
-    float fh1 = npy_half_to_float(h1);
-    float fh2 = npy_half_to_float(h2);
+    float fh1 = npymath_half_to_float(h1);
+    float fh2 = npymath_half_to_float(h2);
     float div, mod;
 
-    div = npy_divmodf(fh1, fh2, &mod);
-    *modulus = npy_float_to_half(mod);
-    return npy_float_to_half(div);
+    div = npymath_divmodf(fh1, fh2, &mod);
+    *modulus = npymath_float_to_half(mod);
+    return npymath_float_to_half(div);
 }
 
 
@@ -284,7 +282,7 @@ npymath_half npy_half_divmod(npymath_half h1, npymath_half h2, npymath_half *mod
  ********************************************************************
  */
 
-npymath_uint16 npy_floatbits_to_halfbits(npymath_uint32 f)
+npymath_uint16 npymath_floatbits_to_halfbits(npymath_uint32 f)
 {
     npymath_uint32 f_exp, f_sig;
     npymath_uint16 h_sgn, h_exp, h_sig;
@@ -311,8 +309,8 @@ npymath_uint16 npy_floatbits_to_halfbits(npymath_uint32 f)
             }
         } else {
             /* overflow to signed inf */
-#if NPY_HALF_GENERATE_OVERFLOW
-            npy_set_floatstatus_overflow();
+#if NPYMATH_HALF_GENERATE_OVERFLOW
+            npymath_set_floatstatus_overflow();
 #endif
             return (npymath_uint16) (h_sgn + 0x7c00u);
         }
@@ -325,10 +323,10 @@ npymath_uint16 npy_floatbits_to_halfbits(npymath_uint32 f)
          * exponents all convert to signed zero half-floats.
          */
         if (f_exp < 0x33000000u) {
-#if NPY_HALF_GENERATE_UNDERFLOW
+#if NPYMATH_HALF_GENERATE_UNDERFLOW
             /* If f != 0, it underflowed to 0 */
             if ((f&0x7fffffff) != 0) {
-                npy_set_floatstatus_underflow();
+                npymath_set_floatstatus_underflow();
             }
 #endif
             return h_sgn;
@@ -336,10 +334,10 @@ npymath_uint16 npy_floatbits_to_halfbits(npymath_uint32 f)
         /* Make the subnormal significand */
         f_exp >>= 23;
         f_sig = (0x00800000u + (f&0x007fffffu));
-#if NPY_HALF_GENERATE_UNDERFLOW
+#if NPYMATH_HALF_GENERATE_UNDERFLOW
         /* If it's not exactly represented, it underflowed */
         if ((f_sig&(((npymath_uint32)1 << (126 - f_exp)) - 1)) != 0) {
-            npy_set_floatstatus_underflow();
+            npymath_set_floatstatus_underflow();
         }
 #endif
         /*
@@ -350,7 +348,7 @@ npymath_uint16 npy_floatbits_to_halfbits(npymath_uint32 f)
          */
         f_sig >>= (113 - f_exp);
         /* Handle rounding by adding 1 to the bit beyond half precision */
-#if NPY_HALF_ROUND_TIES_TO_EVEN
+#if NPYMATH_HALF_ROUND_TIES_TO_EVEN
         /*
          * If the last bit in the half significand is 0 (already even), and
          * the remaining bit pattern is 1000...0, then we do not add one
@@ -377,7 +375,7 @@ npymath_uint16 npy_floatbits_to_halfbits(npymath_uint32 f)
     h_exp = (npymath_uint16) ((f_exp - 0x38000000u) >> 13);
     /* Handle rounding by adding 1 to the bit beyond half precision */
     f_sig = (f&0x007fffffu);
-#if NPY_HALF_ROUND_TIES_TO_EVEN
+#if NPYMATH_HALF_ROUND_TIES_TO_EVEN
     /*
      * If the last bit in the half significand is 0 (already even), and
      * the remaining bit pattern is 1000...0, then we do not add one
@@ -396,10 +394,10 @@ npymath_uint16 npy_floatbits_to_halfbits(npymath_uint32 f)
      * correct result.  h_exp may increment to 15, at greatest, in
      * which case the result overflows to a signed inf.
      */
-#if NPY_HALF_GENERATE_OVERFLOW
+#if NPYMATH_HALF_GENERATE_OVERFLOW
     h_sig += h_exp;
     if (h_sig == 0x7c00u) {
-        npy_set_floatstatus_overflow();
+        npymath_set_floatstatus_overflow();
     }
     return h_sgn + h_sig;
 #else
@@ -407,7 +405,7 @@ npymath_uint16 npy_floatbits_to_halfbits(npymath_uint32 f)
 #endif
 }
 
-npymath_uint16 npy_doublebits_to_halfbits(npymath_uint64 d)
+npymath_uint16 npymath_doublebits_to_halfbits(npymath_uint64 d)
 {
     npymath_uint64 d_exp, d_sig;
     npymath_uint16 h_sgn, h_exp, h_sig;
@@ -434,8 +432,8 @@ npymath_uint16 npy_doublebits_to_halfbits(npymath_uint64 d)
             }
         } else {
             /* overflow to signed inf */
-#if NPY_HALF_GENERATE_OVERFLOW
-            npy_set_floatstatus_overflow();
+#if NPYMATH_HALF_GENERATE_OVERFLOW
+            npymath_set_floatstatus_overflow();
 #endif
             return h_sgn + 0x7c00u;
         }
@@ -448,10 +446,10 @@ npymath_uint16 npy_doublebits_to_halfbits(npymath_uint64 d)
          * exponents all convert to signed zero half-floats.
          */
         if (d_exp < 0x3e60000000000000ULL) {
-#if NPY_HALF_GENERATE_UNDERFLOW
+#if NPYMATH_HALF_GENERATE_UNDERFLOW
             /* If d != 0, it underflowed to 0 */
             if ((d&0x7fffffffffffffffULL) != 0) {
-                npy_set_floatstatus_underflow();
+                npymath_set_floatstatus_underflow();
             }
 #endif
             return h_sgn;
@@ -459,10 +457,10 @@ npymath_uint16 npy_doublebits_to_halfbits(npymath_uint64 d)
         /* Make the subnormal significand */
         d_exp >>= 52;
         d_sig = (0x0010000000000000ULL + (d&0x000fffffffffffffULL));
-#if NPY_HALF_GENERATE_UNDERFLOW
+#if NPYMATH_HALF_GENERATE_UNDERFLOW
         /* If it's not exactly represented, it underflowed */
         if ((d_sig&(((npymath_uint64)1 << (1051 - d_exp)) - 1)) != 0) {
-            npy_set_floatstatus_underflow();
+            npymath_set_floatstatus_underflow();
         }
 #endif
         /*
@@ -476,7 +474,7 @@ npymath_uint16 npy_doublebits_to_halfbits(npymath_uint64 d)
         assert(d_exp - 998 >= 0);
         d_sig <<= (d_exp - 998);
         /* Handle rounding by adding 1 to the bit beyond half precision */
-#if NPY_HALF_ROUND_TIES_TO_EVEN
+#if NPYMATH_HALF_ROUND_TIES_TO_EVEN
         /*
          * If the last bit in the half significand is 0 (already even), and
          * the remaining bit pattern is 1000...0, then we do not add one
@@ -501,7 +499,7 @@ npymath_uint16 npy_doublebits_to_halfbits(npymath_uint64 d)
     h_exp = (npymath_uint16) ((d_exp - 0x3f00000000000000ULL) >> 42);
     /* Handle rounding by adding 1 to the bit beyond half precision */
     d_sig = (d&0x000fffffffffffffULL);
-#if NPY_HALF_ROUND_TIES_TO_EVEN
+#if NPYMATH_HALF_ROUND_TIES_TO_EVEN
     /*
      * If the last bit in the half significand is 0 (already even), and
      * the remaining bit pattern is 1000...0, then we do not add one
@@ -521,10 +519,10 @@ npymath_uint16 npy_doublebits_to_halfbits(npymath_uint64 d)
      * correct result.  h_exp may increment to 15, at greatest, in
      * which case the result overflows to a signed inf.
      */
-#if NPY_HALF_GENERATE_OVERFLOW
+#if NPYMATH_HALF_GENERATE_OVERFLOW
     h_sig += h_exp;
     if (h_sig == 0x7c00u) {
-        npy_set_floatstatus_overflow();
+        npymath_set_floatstatus_overflow();
     }
     return h_sgn + h_sig;
 #else
@@ -532,7 +530,7 @@ npymath_uint16 npy_doublebits_to_halfbits(npymath_uint64 d)
 #endif
 }
 
-npymath_uint32 npy_halfbits_to_floatbits(npymath_uint16 h)
+npymath_uint32 npymath_halfbits_to_floatbits(npymath_uint16 h)
 {
     npymath_uint16 h_exp, h_sig;
     npymath_uint32 f_sgn, f_exp, f_sig;
@@ -564,7 +562,7 @@ npymath_uint32 npy_halfbits_to_floatbits(npymath_uint16 h)
     }
 }
 
-npymath_uint64 npy_halfbits_to_doublebits(npymath_uint16 h)
+npymath_uint64 npymath_halfbits_to_doublebits(npymath_uint16 h)
 {
     npymath_uint16 h_exp, h_sig;
     npymath_uint64 d_sgn, d_exp, d_sig;

@@ -1,5 +1,5 @@
-#ifndef NPYMATH_ENDIAN_H_
-#define NPYMATH_ENDIAN_H_
+#ifndef LIBNPYMATH_ENDIAN_H_
+#define LIBNPYMATH_ENDIAN_H_
 
 /*
  * NPYMATH_BYTE_ORDER is set to the same value as BYTE_ORDER set by glibc in
@@ -32,7 +32,7 @@
 
 #ifndef NPYMATH_BYTE_ORDER
     /* Set endianness info using target CPU */
-    #include "numpy/npymath/cpu.h"
+    #include "libnpymath/cpu.h"
 
     #define NPYMATH_LITTLE_ENDIAN 1234
     #define NPYMATH_BIG_ENDIAN 4321
@@ -74,4 +74,4 @@
 
 #endif
 
-#endif  /* NPYMATH_ENDIAN_H_ */
+#endif  /* LIBNPYMATH_ENDIAN_H_ */

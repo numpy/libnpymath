@@ -6,4 +6,4 @@
  */
 
 #define NPYMATH_INLINE_MATH 0
-#include "numpy/npymath/internal.h"
+#include "libnpymath/internal.h"

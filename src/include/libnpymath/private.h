@@ -15,8 +15,8 @@
  * $FreeBSD$
  */
 
-#ifndef _NPYMATH_PRIVATE_H_
-#define _NPYMATH_PRIVATE_H_
+#ifndef LIBNPYMATH_PRIVATE_H_
+#define LIBNPYMATH_PRIVATE_H_
 
 #include <Python.h>
 #ifdef __cplusplus
@@ -27,11 +27,11 @@ using std::isless;
 #include <math.h>
 #endif
 
-#include "numpy/npymath/fpmath.h"
+#include "libnpymath/fpmath.h"
 
-#include "numpy/npy_math.h"
-#include "numpy/npymath/endian.h"
-#include "numpy/npymath/common.h"
+#include "libnpymath/npy_math.h"
+#include "libnpymath/endian.h"
+#include "libnpymath/common.h"
 
 /*
  * The original fdlibm code used statements like:
@@ -478,4 +478,4 @@ do {                                                            \
 
 #endif /* !NPYMATH_HAVE_LDOUBLE_DOUBLE_DOUBLE_* */
 
-#endif /* !_NPYMATH_PRIVATE_H_ */
+#endif /* LIBNPYMATH_PRIVATE_H_ */

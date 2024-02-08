@@ -78,6 +78,6 @@
 /* #undef inline */
 #endif
 
-#ifndef NPYMATH_CONFIG_H_
-#error npymath_config.h should never be included directly, include npymath_config.h instead
+#ifndef LIBNPYMATH_BLOCK_H_
+#error meson_config.h should never be included directly, include block.h instead
 #endif
