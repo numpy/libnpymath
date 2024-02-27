@@ -358,17 +358,17 @@ NPYMATH_INPLACE npymath_longdouble npymath_heavisidel(npymath_longdouble x, npym
  * Complex declarations
  */
 
-npymath_double npymath_creal(const npymath_cdouble *z);
+npymath_double npymath_creal(const npymath_cdouble z);
 void npymath_csetreal(npymath_cdouble *z, npymath_double r);
-npymath_double npymath_cimag(const npymath_cdouble *z);
+npymath_double npymath_cimag(const npymath_cdouble z);
 void npymath_csetimag(npymath_cdouble *z, npymath_double i);
-npymath_float npymath_crealf(const npymath_cfloat *z);
+npymath_float npymath_crealf(const npymath_cfloat z);
 void npymath_csetrealf(npymath_cfloat *z, npymath_float r);
-npymath_float npymath_cimagf(const npymath_cfloat *z);
+npymath_float npymath_cimagf(const npymath_cfloat z);
 void npymath_csetimagf(npymath_cfloat *z, npymath_float i);
-npymath_longdouble npymath_creall(const npymath_clongdouble *z);
+npymath_longdouble npymath_creall(const npymath_clongdouble z);
 void npymath_csetreall(npymath_clongdouble *z, npymath_longdouble r);
-npymath_longdouble npymath_cimagl(const npymath_clongdouble *z);
+npymath_longdouble npymath_cimagl(const npymath_clongdouble z);
 void npymath_csetimagl(npymath_clongdouble *z, npymath_longdouble i);
 
 npymath_cdouble npymath_cpack(npymath_double x, npymath_double y);

@@ -254,6 +254,8 @@ subdir('include/libnpymath')
 # ----------------------------
 
 staticlib_cflags = []
+dep_flags = []
+
 if cc.get_id() == 'msvc'
   # Disable voltbl section for vc142 to allow link using mingw-w64; see:
   # https://github.com/matthew-brett/dll_investigation/issues/1#issuecomment-1100468171
@@ -264,16 +266,12 @@ if cc.get_id() == 'msvc'
   endif
 endif
 
-if get_option('numpy_build')
-  build_flags = [
-    '-DNUMPY_BUILD',
-    '-DNPYMATH_INTERNAL_BUILD',
-    '-DNPYMATH_HAVE_CONFIG_H',
+
+if get_option('use_numpy_types')
+  dep_flags += [
+    '-DNPYMATH_USE_NUMPY_TYPES',
   ]
-else
-  build_flags = []
 endif
-staticlib_cflags += build_flags
 
 libnpymath_sources = [
   src_file.process('ieee754.c.src'),
@@ -323,7 +321,7 @@ else
 endif
 
 libnpymath_dep = declare_dependency(
-  compile_args: build_flags,
+  compile_args: [dep_flags],
   sources: [internal_h],
   include_directories: libnpymath_includes,
   link_with: libnpymath,

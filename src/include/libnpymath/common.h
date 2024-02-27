@@ -4,11 +4,11 @@
 /* need Python.h for Py_intptr_t */
 #include <Python.h>
 
+#include <limits.h>
+
 /* numpconfig.h is auto-generated */
 #include "libnpymath/config.h"
-#if defined(NPYMATH_HAVE_CONFIG_H)
 #include "libnpymath/block.h"
-#endif
 
 /*
  * using static inline modifiers when defining npy_math functions
@@ -39,6 +39,70 @@
 #define NPYMATH_LIKELY(x) (x)
 #define NPYMATH_UNLIKELY(x) (x)
 #endif
+
+#ifndef Py_USING_UNICODE
+#error Must use Python with unicode enabled.
+#endif
+
+/* Need to find the number of bits for each type and
+        make definitions accordingly.
+
+        C states that sizeof(char) == 1 by definition
+
+        So, just using the sizeof keyword won't help.
+
+        It also looks like Python itself uses sizeof(char) quite a
+        bit, which by definition should be 1 all the time.
+
+        Idea: Make Use of CHAR_BIT which should tell us how many
+        BITS per CHARACTER
+*/
+
+/* Include platform definitions -- These are in the C89/90 standard */
+#define NPYMATH_SIZEOF_BYTE 1
+
+#define NPYMATH_BITSOF_CHAR CHAR_BIT
+#define NPYMATH_BITSOF_BYTE (NPYMATH_SIZEOF_BYTE * CHAR_BIT)
+#define NPYMATH_BITSOF_SHORT (NPYMATH_SIZEOF_SHORT * CHAR_BIT)
+#define NPYMATH_BITSOF_INT (NPYMATH_SIZEOF_INT * CHAR_BIT)
+#define NPYMATH_BITSOF_LONG (NPYMATH_SIZEOF_LONG * CHAR_BIT)
+#define NPYMATH_BITSOF_LONGLONG (NPYMATH_SIZEOF_LONGLONG * CHAR_BIT)
+#define NPYMATH_BITSOF_FLOAT (NPYMATH_SIZEOF_FLOAT * CHAR_BIT)
+#define NPYMATH_BITSOF_DOUBLE (NPYMATH_SIZEOF_DOUBLE * CHAR_BIT)
+#define NPYMATH_BITSOF_LONGDOUBLE (NPYMATH_SIZEOF_LONGDOUBLE * CHAR_BIT)
+
+#ifdef NPYMATH_USE_NUMPY_TYPES
+
+typedef npy_longlong npymath_longlong;
+typedef npy_ulonglong npymath_ulonglong;
+
+typedef npy_longdouble npymath_longdouble;
+
+typedef npy_byte npymath_byte;
+typedef npy_ubyte npymath_ubyte;
+typedef npy_ushort npymath_ushort;
+typedef npy_uint npymath_uint;
+typedef npy_ulong npymath_ulong;
+
+typedef npy_short npymath_short;
+typedef npy_int npymath_int;
+typedef npy_long npymath_long;
+typedef npy_float npymath_float;
+typedef npy_double npymath_double;
+
+typedef npy_cdouble npymath_cdouble;
+typedef npy_cfloat npymath_cfloat;
+typedef npy_clongdouble npymath_clongdouble;
+
+typedef npy_uint8 npymath_uint8;
+typedef npy_int16 npymath_int16;
+typedef npy_uint16 npymath_uint16;
+typedef npy_int32 npymath_int32;
+typedef npy_uint32 npymath_uint32;
+typedef npy_int64 npymath_int64;
+typedef npy_uint64 npymath_uint64;
+
+#else /* !NPYMATH_USE_NUMPY_TYPES */
 
 #ifdef PY_LONG_LONG
 typedef PY_LONG_LONG npymath_longlong;
@@ -75,33 +139,19 @@ typedef unsigned long npymath_ulonglong;
     typedef long double npymath_longdouble;
 #endif
 
-#ifndef Py_USING_UNICODE
-#error Must use Python with unicode enabled.
-#endif
-
-
 typedef signed char npymath_byte;
 typedef unsigned char npymath_ubyte;
 typedef unsigned short npymath_ushort;
 typedef unsigned int npymath_uint;
 typedef unsigned long npymath_ulong;
 
-/* These are for completeness */
 typedef short npymath_short;
 typedef int npymath_int;
 typedef long npymath_long;
 typedef float npymath_float;
 typedef double npymath_double;
 
-#if defined(__cplusplus)
-
-#ifdef NUMPY_BUILD
-
-typedef struct _npy_cdouble npymath_cdouble;
-typedef struct _npy_cfloat npymath_cfloat;
-typedef struct _npy_clongdouble npymath_clongdouble;
-
-#else
+#ifdef __cplusplus
 
 typedef struct
 {
@@ -118,9 +168,7 @@ typedef struct
     long double _Val[2];
 } npymath_clongdouble;
 
-#endif
-
-#else
+#else /* !__cplusplus */
 
 #include <complex.h>
 
@@ -132,38 +180,9 @@ typedef _Lcomplex npymath_clongdouble;
 typedef double _Complex npymath_cdouble;
 typedef float _Complex npymath_cfloat;
 typedef longdouble_t _Complex npymath_clongdouble;
-#endif
+#endif /* defined(_MSC_VER) && !defined(__INTEL_COMPILER) */
 
-#endif
-
-        /* Need to find the number of bits for each type and
-           make definitions accordingly.
-
-           C states that sizeof(char) == 1 by definition
-
-           So, just using the sizeof keyword won't help.
-
-           It also looks like Python itself uses sizeof(char) quite a
-           bit, which by definition should be 1 all the time.
-
-           Idea: Make Use of CHAR_BIT which should tell us how many
-           BITS per CHARACTER
-        */
-
-        /* Include platform definitions -- These are in the C89/90 standard */
-#include <limits.h>
-
-#define NPYMATH_SIZEOF_BYTE 1
-
-#define NPYMATH_BITSOF_CHAR CHAR_BIT
-#define NPYMATH_BITSOF_BYTE (NPYMATH_SIZEOF_BYTE * CHAR_BIT)
-#define NPYMATH_BITSOF_SHORT (NPYMATH_SIZEOF_SHORT * CHAR_BIT)
-#define NPYMATH_BITSOF_INT (NPYMATH_SIZEOF_INT * CHAR_BIT)
-#define NPYMATH_BITSOF_LONG (NPYMATH_SIZEOF_LONG * CHAR_BIT)
-#define NPYMATH_BITSOF_LONGLONG (NPYMATH_SIZEOF_LONGLONG * CHAR_BIT)
-#define NPYMATH_BITSOF_FLOAT (NPYMATH_SIZEOF_FLOAT * CHAR_BIT)
-#define NPYMATH_BITSOF_DOUBLE (NPYMATH_SIZEOF_DOUBLE * CHAR_BIT)
-#define NPYMATH_BITSOF_LONGDOUBLE (NPYMATH_SIZEOF_LONGDOUBLE * CHAR_BIT)
+#endif /* __cplusplus */
 
 #if NPYMATH_BITSOF_LONG == 8
 #define NPYMATH_INT8
@@ -283,9 +302,9 @@ typedef longdouble_t _Complex npymath_clongdouble;
 #endif
 #endif
 
+#endif /* NPYMATH_USE_NUMPY_TYPES */
+
 /* half/float16 isn't a floating-point type in C */
 typedef npymath_uint16 npymath_half;
-
-/* End of typedefs for numarray style bit-width names */
 
 #endif  /* LIBNPYMATH_COMMON_H_ */
